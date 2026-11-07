@@ -183,3 +183,18 @@ apple-silicon-llm/
 * **Author:** Howard Liao Ph.D.
 * **License:** MIT License
 * **Attribution:** Any usage or deployment based on this blueprint should cite **Howard Liao Ph.D.**
+
+---
+
+## Multi-Disk Storage Matrix & Search Engine (多硬碟全域檢合與智慧搜尋引擎)
+
+除了地端模型算力之外，本節點亦同步整合 Mac mini 本地 512GB APFS SSD 與兩座外接實體硬碟（WD My Book 14TB 主力歸檔庫 + DigiFusion 640GB 工具庫），建置全域資料檢合與智慧檢索引擎：
+
+- **線上即時搜尋引擎：** [https://howardliao.github.io/apple-silicon-llm/storage-search.html](https://howardliao.github.io/apple-silicon-llm/storage-search.html)
+- **多磁碟歸檔儀表板：** [https://howardliao.github.io/apple-silicon-llm/catalog.html](https://howardliao.github.io/apple-silicon-llm/catalog.html)
+
+### 關鍵檢核指標
+- **總儲存池規模：** 15.1 TB (已分配 10.6 TB / 剩餘緩衝 2.96 TB)
+- **總索引專案與文件：** 9,108 筆
+- **跨碟重複備份審計：** 2,601 處跨碟副本 (精準標記 WD 與 DigiFusion 歷史重疊)
+- **業務實體八大領域：** 盛欣／盛碁網絡、CSN / XSG、資安治理 (CISO)、高管履歷作品集、家庭房產法律、系統映像與虛擬機等

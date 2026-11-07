@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="egyptian">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多磁碟智慧歸檔與檢索儀表板 | Storage Catalog & Navigator</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --font-mono: "SF Mono", "Fira Code", Menlo, Monaco, Consolas, monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Theme 1: Egyptian Pharaoh (Howard Signature: Clean Ivory, Dark Slate, Amber Gold) */
+    html[data-theme="egyptian"] {
+      --bg-base: #f9f8f5;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #faf7f2;
+      --border-subtle: #eae4d8;
+      --border-strong: #d4c5ab;
+      --text-main: #1f2421;
+      --text-muted: #5e6560;
+      --text-light: #8b928c;
+      --accent-primary: #c98a2c;
+      --accent-hover: #b0741e;
+      --accent-soft: #fcf4e8;
+      --accent-badge: #d97706;
+      --bar-bg: #e8e2d5;
+      --card-shadow: 0 4px 18px rgba(40, 30, 20, 0.05);
+      --highlight: #b45309;
+    }
+
+    /* Theme 2: Deep Obsidian (Default Executive Dark) */
+    html[data-theme="obsidian"] {
+      --bg-base: #0c0e12;
+      --bg-surface: #14171f;
+      --bg-card: #191d26;
+      --bg-card-hover: #202531;
+      --border-subtle: #252b38;
+      --border-strong: #374154;
+      --text-main: #f1f4f9;
+      --text-muted: #9aa4b6;
+      --text-light: #5f6b80;
+      --accent-primary: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --accent-badge: #38bdf8;
+      --bar-bg: #222938;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+      --highlight: #7dd3fc;
+    }
+
+    /* Theme 3: Milan Warm Amber (Executive Word/Docs Style) */
+    html[data-theme="milan"] {
+      --bg-base: #f6f3ee;
+      --bg-surface: #ede8e0;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fcfbf9;
+      --border-subtle: #e0d7c8;
+      --border-strong: #c8b9a3;
+      --text-main: #2b2621;
+      --text-muted: #6e6459;
+      --text-light: #94887a;
+      --accent-primary: #a35624;
+      --accent-hover: #864117;
+      --accent-soft: #f8ede6;
+      --accent-badge: #c05621;
+      --bar-bg: #ded6c9;
+      --card-shadow: 0 4px 16px rgba(45, 30, 15, 0.06);
+      --highlight: #c05621;
+    }
+
+    /* Theme 4: Gustav Klimt (Gilded Luxury) */
+    html[data-theme="klimt"] {
+      --bg-base: #141613;
+      --bg-surface: #1c1f1a;
+      --bg-card: #232720;
+      --bg-card-hover: #2c3228;
+      --border-subtle: #3a4234;
+      --border-strong: #645a30;
+      --text-main: #f4eed9;
+      --text-muted: #b8b39d;
+      --text-light: #7c7866;
+      --accent-primary: #e6b800;
+      --accent-hover: #ffcf10;
+      --accent-soft: rgba(230, 184, 0, 0.15);
+      --accent-badge: #d4a017;
+      --bar-bg: #2d3329;
+      --card-shadow: 0 6px 24px rgba(20, 20, 10, 0.6);
+      --highlight: #fed856;
+    }
+
+    /* Theme 5: Mika Ninagawa (Vibrant Crimson & Violet) */
+    html[data-theme="ninagawa"] {
+      --bg-base: #0f0a15;
+      --bg-surface: #181122;
+      --bg-card: #221731;
+      --bg-card-hover: #2e1f42;
+      --border-subtle: #3a2552;
+      --border-strong: #5c3284;
+      --text-main: #fde8f5;
+      --text-muted: #bfa9cb;
+      --text-light: #7a6688;
+      --accent-primary: #ec4899;
+      --accent-hover: #f43f5e;
+      --accent-soft: rgba(236, 72, 153, 0.15);
+      --accent-badge: #f472b6;
+      --bar-bg: #2a1b3d;
+      --card-shadow: 0 6px 24px rgba(40, 10, 50, 0.5);
+      --highlight: #fb7185;
+    }
+
+    /* Theme 6: Joan Miró (Modern Whimsical Primary) */
+    html[data-theme="miro"] {
+      --bg-base: #f4f6fa;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8faff;
+      --border-subtle: #e2e8f0;
+      --border-strong: #0f172a;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-light: #94a3b8;
+      --accent-primary: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --accent-badge: #dc2626;
+      --bar-bg: #e2e8f0;
+      --card-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      --highlight: #ea580c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Header & Navigation Bar */
+    .top-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .brand-text h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Theme Selector Dropdown */
+    .theme-select {
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: var(--transition);
+    }
+    .theme-select:hover {
+      border-color: var(--accent-primary);
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Bento Analytics Cards */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .bento-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    .bento-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-primary);
+      opacity: 0.8;
+    }
+
+    .bento-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .bento-header span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .bento-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: var(--accent-soft);
+      color: var(--accent-badge);
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .bento-value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .bento-desc {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* Disks Hardware Bar Grid */
+    .disks-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .disk-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .disk-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .disk-title-group h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .disk-sub {
+      font-size: 12px;
+      color: var(--text-light);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+
+    .disk-progress-bar {
+      height: 9px;
+      background: var(--bar-bg);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .disk-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-badge));
+      border-radius: 999px;
+      transition: width 0.8s ease;
+    }
+
+    .disk-stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .disk-stats-row strong {
+      color: var(--text-main);
+    }
+
+    /* Search & Filter Control Station */
+    .control-station {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .search-box-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      font-size: 15px;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      color: var(--text-main);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: none;
+    }
+    .search-clear-btn:hover {
+      color: var(--text-main);
+    }
+
+    /* Filter Pills */
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-light);
+      min-width: 60px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pill-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .pill-btn.active {
+      background: var(--accent-primary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .count-indicator {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-left: 2px;
+    }
+
+    /* Results Header */
+    .results-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+
+    .results-count {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .results-count strong {
+      color: var(--text-main);
+    }
+
+    /* Catalog Cards Grid */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+      gap: 16px;
+    }
+
+    .item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      border-color: var(--border-strong);
+    }
+
+    .item-card-top {
+      margin-bottom: 12px;
+    }
+
+    .item-badges {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .badge-cat {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      color: var(--accent-badge);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-disk {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--border-subtle);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .item-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      word-break: break-all;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .item-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    /* Sub children items preview */
+    .item-children {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+
+    .children-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .children-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .sub-pill {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    /* Path & Quick Action Bar */
+    .item-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .path-display {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      background: var(--bg-base);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .action-btn {
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .action-btn:hover {
+      background: var(--accent-primary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text-main);
+      color: var(--bg-base);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
+    }
+    .empty-state h3 {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    @media print {
+      .top-header, .control-station, .action-btn, .theme-select {
+        display: none !important;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+      }
+      .item-card {
+        break-inside: avoid;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .catalog-grid {
+        grid-template-columns: 1fr;
+      }
+      .disks-overview {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="top-header">
+    <div class="header-container">
+      <div class="brand-title">
+        <div class="brand-logo">🗄️</div>
+        <div class="brand-text">
+          <h1>多磁碟智慧歸檔與檢索儀表板</h1>
+          <p>Storage Matrix & Intelligent Directory Navigator • Howard Liao Ph.D.</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="action-btn" style="text-decoration:none;">🧠 LLM 試算指南</a>
+        <a href="storage-search.html" class="action-btn" style="text-decoration:none;">⚡ 智慧搜尋引擎</a>
+        <label for="themeSelector" style="font-size:12px; font-weight:600; color:var(--text-muted); margin-left:6px;">風格主題：</label>
+        <select id="themeSelector" class="theme-select" onchange="changeTheme(this.value)">
+          <option value="egyptian" selected>埃及法老 (Egyptian Pharaoh)</option>
+          <option value="obsidian">深邃黑曜 (Deep Obsidian)</option>
+          <option value="milan">米蘭暖珀 (Milan Warm Amber)</option>
+          <option value="klimt">克林姆金 (Gustav Klimt)</option>
+          <option value="ninagawa">蜷川實花 (Mika Ninagawa)</option>
+          <option value="miro">米羅狂想 (Joan Miró)</option>
+        </select>
+        <button class="action-btn" onclick="window.print()" title="列印或另存 PDF">🖨️ 列印歸檔</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    
+    <!-- Bento Metrics Analytics Grid -->
+    <section class="bento-grid">
+      <div class="bento-card">
+        <div class="bento-header">
+          <span>總儲存容量 (Physical Total)</span>
+          <span class="bento-badge">跨 3 顆實體儲存</span>
+        </div>
+        <div class="bento-value">15.1 TB</div>
+        <div class="bento-desc">內建 512GB SSD + 外接 14TB WD + 外接 640GB HDD</div>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-header">
+          <span>已使用總空間 (Allocated Storage)</span>
+          <span class="bento-badge">利用率 70.2%</span>
+        </div>
+        <div class="bento-value">10.6 TB</div>
+        <div class="bento-desc">剩餘可用空間約 2.96 TB (WD 2.4TB / 內建 354GB)</div>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-header">
+          <span>收錄索引目錄 (Indexed Entries)</span>
+          <span class="bento-badge">已完成 100% 掃描</span>
+        </div>
+        <div class="bento-value">158 個</div>
+        <div class="bento-desc">含 14 組本地 Git 倉庫、7 大架構與歷史歸檔模組</div>
+      </div>
+
+      <div class="bento-card">
+        <div class="bento-header">
+          <span>磁碟掛載與健康狀態</span>
+          <span class="bento-badge" style="background:#def7ec; color:#03543f;">全數在線</span>
+        </div>
+        <div class="bento-value">3 / 3 顆</div>
+        <div class="bento-desc">Macintosh HD、My Book 14T、DigiFusion 正常掛載</div>
+      </div>
+    </section>
+
+    <!-- Disks Overview & Capacity Bars -->
+    <section class="disks-overview">
+      <div class="disk-card">
+        <div class="disk-top">
+          <div class="disk-title-group">
+            <h3>💻 Macintosh HD (內建)</h3>
+            <div class="disk-sub">/dev/disk3s5 • 掛載路徑: /</div>
+          </div>
+          <span class="bento-badge">19% 已用</span>
+        </div>
+        <div class="disk-progress-bar">
+          <div class="disk-progress-fill" style="width: 19%;"></div>
+        </div>
+        <div class="disk-stats-row">
+          <span>已用 <strong>81 GiB</strong> / 總共 460 GiB</span>
+          <span>可用 <strong>354 GiB</strong></span>
+        </div>
+      </div>
+
+      <div class="disk-card">
+        <div class="disk-top">
+          <div class="disk-title-group">
+            <h3>🗄️ WD My Book (外接主力)</h3>
+            <div class="disk-sub">/dev/disk4s1 • /Volumes/My Book</div>
+          </div>
+          <span class="bento-badge" style="background:#fee2e2; color:#b91c1c;">81% 已用</span>
+        </div>
+        <div class="disk-progress-bar">
+          <div class="disk-progress-fill" style="width: 81%;"></div>
+        </div>
+        <div class="disk-stats-row">
+          <span>已用 <strong>10.0 TiB</strong> / 總共 13 TiB</span>
+          <span>可用 <strong>2.4 TiB</strong></span>
+        </div>
+      </div>
+
+      <div class="disk-card">
+        <div class="disk-top">
+          <div class="disk-title-group">
+            <h3>💾 DigiFusion (外接備份)</h3>
+            <div class="disk-sub">/dev/disk7s4 • /Volumes/DigiFusion</div>
+          </div>
+          <span class="bento-badge">65% 已用</span>
+        </div>
+        <div class="disk-progress-bar">
+          <div class="disk-progress-fill" style="width: 65%;"></div>
+        </div>
+        <div class="disk-stats-row">
+          <span>已用 <strong>374 GiB</strong> / 總共 583 GiB</span>
+          <span>可用 <strong>209 GiB</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control Station: Real-time Search & Filter Pills -->
+    <section class="control-station">
+      <div class="search-box-wrap">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="搜尋目錄名稱、路徑、專案代號（例：盛欣, 2024, 監控, 嶺東, PortFilio, VM, 貸款, 備份...）[快速鍵: Cmd+K / /]"
+          oninput="handleSearch()"
+        />
+        <button id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()">✕ 清除</button>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-row">
+          <span class="filter-label">儲存磁碟</span>
+          <div class="filter-pills" id="diskPills">
+            <button class="pill-btn active" data-disk="all" onclick="setDiskFilter('all')">全部磁碟 <span class="count-indicator">(158)</span></button>
+            <button class="pill-btn" data-disk="internal" onclick="setDiskFilter('internal')">Macintosh HD 內建 <span class="count-indicator">(59)</span></button>
+            <button class="pill-btn" data-disk="mybook" onclick="setDiskFilter('mybook')">WD My Book 14TB <span class="count-indicator">(68)</span></button>
+            <button class="pill-btn" data-disk="digifusion" onclick="setDiskFilter('digifusion')">DigiFusion 640GB <span class="count-indicator">(31)</span></button>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">分類維度</span>
+          <div class="filter-pills" id="catPills">
+            <button class="pill-btn active" data-cat="all" onclick="setCatFilter('all')">全部分類</button>
+            <button class="pill-btn" data-cat="enterprise" onclick="setCatFilter('enterprise')">🏢 企業治理與業務體系</button>
+            <button class="pill-btn" data-cat="security" onclick="setCatFilter('security')">🛡️ 資安架構與技術專案</button>
+            <button class="pill-btn" data-cat="portfolio" onclick="setCatFilter('portfolio')">💼 高管履歷與作品集</button>
+            <button class="pill-btn" data-cat="family_wealth" onclick="setCatFilter('family_wealth')">🏠 家庭、資產與理財</button>
+            <button class="pill-btn" data-cat="tools_vms" onclick="setCatFilter('tools_vms')">💾 系統映像與工具軟體</button>
+            <button class="pill-btn" data-cat="devices_media" onclick="setCatFilter('devices_media')">📱 裝置備份與多媒體</button>
+            <button class="pill-btn" data-cat="downloads_staging" onclick="setCatFilter('downloads_staging')">📂 歷史下載與研析暫存</button>
+            <button class="pill-btn" data-cat="other" onclick="setCatFilter('other')">📁 綜合資料與存檔</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Status Meta -->
+    <div class="results-meta">
+      <div class="results-count" id="resultsCount">
+        正在顯示 <strong>158</strong> 個收錄項目
+      </div>
+      <div style="font-size:12px; color:var(--text-light);">
+        💡 點擊「複製路徑」可在終端機中 <code>open "路徑"</code> 直接開啟 Finder
+      </div>
+    </div>
+
+    <!-- Catalog Cards Grid -->
+    <section class="catalog-grid" id="catalogGrid">
+      <!-- Injected by JavaScript -->
+    </section>
+
+  </main>
+
+  <div id="toast" class="toast">
+    <span>✅ 已複製完整路徑至剪貼簿！</span>
+  </div>
+
+  <script>
+    const CATALOG_DATA = [{"name": "2021_WORK", "path": "/Volumes/DigiFusion/2021_WORK", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 1, "sample_children": ["劉董的需求"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「2021_WORK」"}, {"name": "20210928_Howard下載項目", "path": "/Volumes/DigiFusion/20210928_Howard下載項目", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 633, "sample_children": ["(列印一份)特店基本資料表暨連線通知設定表-.xlsx", "+2021-臺灣創育產業關鍵報告.pdf", "0.2021_CSN_資訊主機及網路建置.pdf", "0101.rar", "01人事資料表.docx", "01特約商店代收代付服務合約書(易沛).pdf", "0528-30組 3v控制卡報價單.pdf", "0615-嘉洲-樹莓派維修報價單.pdf", "0702.pdf", "0727-100組樹莓派報價單.pdf", "0804-100組樹莓派報價單.pdf", "0805-編碼器20台報價單.pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210928_Howard下載項目」"}, {"name": "20210906_Temp", "path": "/Volumes/DigiFusion/20210906_Temp", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 637, "sample_children": ["(列印一份)特店基本資料表暨連線通知設定表-.xlsx", "(繁中)皇家電子遊戲整合API參考文件-轉帳錢包_v1.4.0.pdf", "0.2021_CSN_資訊主機及網路建置.pdf", "0101.rar", "01人事資料表.docx", "0528-100組樹莓派報價單(1).pdf", "0528-100組樹莓派報價單.pdf", "0528-30組 3v控制卡報價單.pdf", "0615-嘉洲-樹莓派維修報價單.pdf", "0702(1).pdf", "0702.pdf", "0727-100組樹莓派報價單.pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210906_Temp」"}, {"name": "20210916_MAC_最近項目", "path": "/Volumes/DigiFusion/20210916_MAC_最近項目", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 967, "sample_children": ["#U6c42#U804c#U7b80#U5386 (6).docx", "#U6c42#U804c#U7b80#U5386 (94).docx", "#U7b80#U5386#U6a21#U677f (44).docx", "(已用印)110.06.20 CSN電腦設備買賣契約書.pdf", "(附件六)OT01-TWSSI20180103-資訊部門資訊安全契約條款.docx", "(階段二)嶺東科技大學因應新型冠狀病毒肺炎疫情學生校外實習家長同意書1100521.docx", "+2021-臺灣創育產業關鍵報告.pdf", "0.2021_CSN_資訊主機及網路建置 2.pdf", "0.2021_CSN_資訊主機及網路建置.pdf", "01人事資料表 2.docx", "01人事資料表.docx", "01特約商店代收代付服務合約書(易沛).pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210916_MAC_最近項目」"}, {"name": "2021_10_桌面", "path": "/Volumes/DigiFusion/2021_10_桌面", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 298, "sample_children": ["01人事資料表.docx", "1.pdf", "100CYUT5396015-001.pdf", "1050520la14.docx", "109年度跨電案申請須_簡報.pdf", "109年資訊服務業發展計畫－數位轉型工坊研討會.pdf", "11.pdf", "1107792_海洋天堂總動員加強版_69a2c4b6-fe6e-4a84-95ea-3cd187606f81.pdf", "110QG007-2-嘉洲貿易機房建置工程報價單.pdf", "110兼課教師履歷表.doc", "11月銷售List-10911.xlsx", "157347048_2781745582079647_5145368656017462205_o.jpg"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「2021_10_桌面」"}, {"name": "Downloads", "path": "/Volumes/DigiFusion/Downloads", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 1, "sample_children": ["應用程式"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Downloads」"}, {"name": "雜誌", "path": "/Volumes/DigiFusion/雜誌", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 10, "sample_children": ["2020-03-26 先探週刊2084期--超前部署價值股.pdf", "2020-03-30 今周刊1214期--封境後的試煉.pdf", "2020-03-30 商業周刊1689期--搶救大失業潮.pdf", "2020-04-01 Smart-4月-疫情風暴.pdf", "Money錢.2020年04月.pdf", "今周刊20200323第1213期-momo憑什麼贏！.pdf", "先探投資週刊 20210423 [第2140期]庫存x漲價 最強利多.pdf", "先探投資週刊20200320第2083期-熱門產業現金流生存戰.pdf", "商業周刊20200323第1688期-零接觸商機來了.pdf", "財訊雙週刊20200319第603期-全球大殺盤.誰是台股不敗防線.pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「雜誌」"}, {"name": "2021_Mac_App", "path": "/Volumes/DigiFusion/2021_Mac_App", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 24, "sample_children": ["Adobe_Acrobat_Pro_DC_21.007.20091_f__macwk.com.dmg", "Axure_RP_9_9.0.0.3728_(最低10.9.0)__macwk.com.dmg", "Commander_One_3.3_(3508)_(最低10.12)__macwk.com.dmg", "DaisyDisk_4.21.4_(最低10.10)__macwk.com.dmg", "DropboxInstaller.dmg", "Final_Cut_Pro_10.6.1_(401159)_(最低11.5.1)__macwk.com.dmg", "FortiClientVPNOnlineInstaller_7.0.dmg", "Gemini_2_2.8.11_(384)_(最低10.10)__macwk.com.dmg", "LogiPresentation_1.62.2.dmg", "MEGAsyncSetup.dmg", "MindManager_Mac_14.0.178.dmg", "Navicat_Premium_16.0.6_(16.0.600)_(最低10.14)__macwk.com.dmg"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「2021_Mac_App」"}, {"name": "APPs", "path": "/Volumes/DigiFusion/APPs", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 6, "sample_children": ["Office2019", "PowerPoint Template", "TreeSizeFreeSetup.exe", "axurerppro9_143602.rar", "installshield2020_40358.zip", "鉅盛商用軟體"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「APPs」"}, {"name": "Mac_Apps", "path": "/Volumes/DigiFusion/Mac_Apps", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 4, "sample_children": ["20211008_Office 2018_Mac", "Mindjet_Mac_10.1.505.dmg", "Theme", "lovepik"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Mac_Apps」"}, {"name": "Office2019.zip", "path": "/Volumes/DigiFusion/Office2019.zip", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Office2019.zip」"}, {"name": "Program Files (x86)", "path": "/Volumes/DigiFusion/Program Files (x86)", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 71, "sample_children": ["Abyssmedia", "Adobe", "Android", "Apple Software Update", "Application Verifier", "Avira", "Axure", "Bonjour", "CTBC", "Chunghwa Telecom", "Common Files", "DevExpress 18.2"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Program Files (x86)」"}, {"name": "Tools", "path": "/Volumes/DigiFusion/Tools", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 25, "sample_children": ["AnyDesk.exe", "Devolutions", "EverythingPortable", "FSCapturePortable", "GlaryUtilitiesPortable", "HONEYVIEW-PORTABLE", "Howard Liao", "Images", "KMPlayerPortable", "KMPlayerPortable64", "KS-Soft.Advanced.Host.Monitor.10.60.Enterprise", "Mindjet MindManager 2018"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Tools」"}, {"name": "VMappliance", "path": "/Volumes/DigiFusion/VMappliance", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 16, "sample_children": ["CentOS 7 64-bit-c6f5fa8e.vmem", "CentOS 7 64-bit-c6f5fa8e.vmss", "CentOS 7 64-bit-s001.vmdk", "CentOS 7 64-bit-s002.vmdk", "CentOS 7 64-bit-s003.vmdk", "CentOS 7 64-bit-s004.vmdk", "CentOS 7 64-bit-s005.vmdk", "CentOS 7 64-bit-s006.vmdk", "CentOS 7 64-bit.nvram", "CentOS 7 64-bit.vmdk", "CentOS 7 64-bit.vmsd", "CentOS 7 64-bit.vmx"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「VMappliance」"}, {"name": "template", "path": "/Volumes/DigiFusion/template", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 131, "sample_children": ["003.pdf", "1061231.pdf", "10801requestform.docx", "108form.docx", "147364713.doc", "1556090649461.jpg", "1559125266431.jpg", "2014-2015台灣製造業資訊科技投資與應用趨勢 - Google 圖書.html", "2014-2015台灣製造業資訊科技投資與應用趨勢 - Google 圖書_files", "20140821164707_cht.pdf", "2017-18ciosurvey.pdf", "2017-taiwan-salary-employment-outlook-zh.pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「template」"}, {"name": "themeforest-V3RlSj0Y-archi-premium-interior-design-joomla-template.zip", "path": "/Volumes/DigiFusion/themeforest-V3RlSj0Y-archi-premium-interior-design-joomla-template.zip", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「themeforest-V3RlSj0Y-archi-premium-interior-design-joomla-template.zip」"}, {"name": "themeforest-pcH29ChW-financial-ii-responsive-financial-joomla-theme.zip", "path": "/Volumes/DigiFusion/themeforest-pcH29ChW-financial-ii-responsive-financial-joomla-theme.zip", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「themeforest-pcH29ChW-financial-ii-responsive-financial-joomla-theme.zip」"}, {"name": "turnkey-redmine-15.2-stretch-amd64.ova", "path": "/Volumes/DigiFusion/turnkey-redmine-15.2-stretch-amd64.ova", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「turnkey-redmine-15.2-stretch-amd64.ova」"}, {"name": "2020", "path": "/Volumes/DigiFusion/2020", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 33, "sample_children": ["2020-益模", "20200102-Amor", "20200113-T-Road", "20200113-Tower", "20200116_SmartBPM", "20200117-中華物聯網與AI開發研究學會", "20200120-House", "20200203-全新冠狀Virus", "20200209-WebEnv", "20200212-SAM", "20200213-台灣胃腸神經與蠕動學會", "20200217-蜀雯給"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「2020」"}, {"name": "20210820_Sam", "path": "/Volumes/DigiFusion/20210820_Sam", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 5, "sample_children": ["177454_20200914醫療結合科技的未來發展.pdf", "20210625_資安法_各級應辦事項.pdf", "Agriculture_Edge_IOT_v1.1.pdf", "cloud 數位轉型 20210531.pdf", "deloitte_5g_academy.pdf"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210820_Sam」"}, {"name": "Local", "path": "/Volumes/DigiFusion/Local", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 94, "sample_children": ["1.平台服務", "2.硬體及網路", "20180621133518_cht.pdf", "20190514-OurSoution.jpg", "20190514-合約", "20190520-資訊人員考試", "20190528-人資資料", "20190613-SAP_BI報表介紹(華致)", "20190617-資訊策略計劃", "20190618-SAP DATA HUB", "20190618-資訊安全管理要點", "20190619-Ariba"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「Local」"}, {"name": "海會員電話A.xls", "path": "/Volumes/DigiFusion/海會員電話A.xls", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「海會員電話A.xls」"}, {"name": "20210329_128G_Backup", "path": "/Volumes/DigiFusion/20210329_128G_Backup", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 9, "sample_children": ["20201112_跨境電商", "20210215_ppt_tamplate", "APPs", "Download", "FoxitPhantomPDF91_L10N.rar", "Local.rar", "data.rar", "iLinkict_PortFolio", "富研智醫_精照系統簡報_v12.pptx"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210329_128G_Backup」"}, {"name": "20211020_iphone_backup", "path": "/Volumes/DigiFusion/20211020_iphone_backup", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 1, "sample_children": ["照片"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20211020_iphone_backup」"}, {"name": "MacBook Pro  Backup", "path": "/Volumes/DigiFusion/MacBook Pro  Backup", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 5, "sample_children": ["Desktop", "Documents", "Downloads", "下載項目", "桌面"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「MacBook Pro  Backup」"}, {"name": "iCloud", "path": "/Volumes/DigiFusion/iCloud", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 2, "sample_children": ["Downloads", "Keynote"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「iCloud」"}, {"name": "20201011-嶺東.pptx", "path": "/Volumes/DigiFusion/20201011-嶺東.pptx", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20201011-嶺東.pptx」"}, {"name": "20210214_江董_002.pptx", "path": "/Volumes/DigiFusion/20210214_江董_002.pptx", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「20210214_江董_002.pptx」"}, {"name": "PortFolio Management", "path": "/Volumes/DigiFusion/PortFolio Management", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 18, "sample_children": ["2019", "20190506.pptx", "20191106-巨將-履歷表 廖倫豪.doc", "2019_Sample001.pptx", "2019_Sample002.pptx", "2020", "2020_CCK", "2020_CCK.rar", "2020_慧智創意", "Howard Logo.jfif", "Howard-Logo1.png", "Howard_Personal"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「PortFolio Management」"}, {"name": "iLinkict_PortFolio", "path": "/Volumes/DigiFusion/iLinkict_PortFolio", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 36, "sample_children": ["0310-防救災系统with5G.pptx", "2019", "201909-iLink", "20191121-友環JIRA", "2019_iLink_Taichung-QMS.pptx", "2019經費及工時預估分析表.xls", "2020", "20200420-工作交接", "994163159L3EO3FL6.pdf", "DevOps", "H13A04-iLInkict專案調適指引.pdf", "H15K04-工作分解結構WBS.xls"], "description": "位於 DigiFusion 外接硬碟中的歷史封存「iLinkict_PortFolio」"}, {"name": "嶺東.pptx", "path": "/Volumes/DigiFusion/嶺東.pptx", "disk_id": "digifusion", "disk_name": "DigiFusion (640GB)", "is_dir": false, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 0, "sample_children": [], "description": "位於 DigiFusion 外接硬碟中的歷史封存「嶺東.pptx」"}, {"name": "HermesAgent/A.產", "path": "/Users/howard/Desktop/HermesAgent/A.產", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 5, "sample_children": ["6446_藥華醫藥全球資安治理", "8436_大江生醫企業資訊策略", "CP_雲杉長青科技夥伴", "ISO_DM_盛欣盛碁ISO四階標準化", "RSI_信源全球2027營運計畫白皮書"], "description": "本機桌面 HermesAgent 核心分類專案目錄「A.產」"}, {"name": "HermesAgent/B.銷", "path": "/Users/howard/Desktop/HermesAgent/B.銷", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 3, "sample_children": ["CP_雲杉長青商務拓展", "howardliao.github.io_個人官方門戶", "portfolio_Howard官方戰略作品集"], "description": "本機桌面 HermesAgent 核心分類專案目錄「B.銷」"}, {"name": "HermesAgent/1.食", "path": "/Users/howard/Desktop/HermesAgent/1.食", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 1, "sample_children": ["BBQ"], "description": "本機桌面 HermesAgent 核心分類專案目錄「1.食」"}, {"name": "HermesAgent/2.衣", "path": "/Users/howard/Desktop/HermesAgent/2.衣", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 3, "sample_children": ["日本購物差價表.html", "日本購物選品指引.html", "衣著與形象規範_IDEA.md"], "description": "本機桌面 HermesAgent 核心分類專案目錄「2.衣」"}, {"name": "HermesAgent/3.住", "path": "/Users/howard/Desktop/HermesAgent/3.住", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 7, "sample_children": ["HAH_在宅醫療與居家照護", "House01_西屯大成都租賃", "House02_赫里翁臻愛租賃", "MaMa_在宅照護與支出戰情", "ShelterCenter_少女綜合收容發展中心", "fuyu_富宇大地社區治理", "家庭法律保全與民法1030-3防衛"], "description": "本機桌面 HermesAgent 核心分類專案目錄「3.住」"}, {"name": "HermesAgent/4.行", "path": "/Users/howard/Desktop/HermesAgent/4.行", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 3, "sample_children": ["SX-Osaka-Trip-2026_大阪差旅觀光手冊", "日本行程購物指南.html", "日本購物差價換算表.html"], "description": "本機桌面 HermesAgent 核心分類專案目錄「4.行」"}, {"name": "HermesAgent/5.育", "path": "/Users/howard/Desktop/HermesAgent/5.育", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 4, "sample_children": ["Google_NotebookLM_Mobile_Recording.pptx", "Google_NotebookLM_Mobile_Recording_preview.html", "SX001_AI金融進階與防詐模擬評量", "Seminar_前沿技術論壇與研討會矩陣"], "description": "本機桌面 HermesAgent 核心分類專案目錄「5.育」"}, {"name": "HermesAgent/6.樂", "path": "/Users/howard/Desktop/HermesAgent/6.樂", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 3, "sample_children": ["Howard_LINE貼圖套件", "SX-Osaka-Trip-2026_員工休閒旅遊", "SX_盛欣鬥陣江湖棋牌產品"], "description": "本機桌面 HermesAgent 核心分類專案目錄「6.樂」"}, {"name": "HermesAgent/C.人", "path": "/Users/howard/Desktop/HermesAgent/C.人", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 7, "sample_children": ["1.人員資料卡+健康調查表-盛欣盛碁.doc", "1.人員資料卡+健康調查表-盛欣盛碁.docx", "1.人員資料卡+健康調查表-盛欣盛碁.html", "1.人員資料卡+健康調查表-盛欣盛碁.pdf", "CareerIsland_3D職涯互動島", "Howard_CISO_高管戰略資安檔案", "journey_組織降維突圍實戰報告"], "description": "本機桌面 HermesAgent 核心分類專案目錄「C.人」"}, {"name": "HermesAgent/E.財", "path": "/Users/howard/Desktop/HermesAgent/E.財", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 3, "sample_children": ["MaMa_長照與生活支出分析戰情", "SX001_金融防詐數位評量系統", "Scam_金融防詐與財務認知防禦論"], "description": "本機桌面 HermesAgent 核心分類專案目錄「E.財」"}, {"name": "HermesAgent/D.發", "path": "/Users/howard/Desktop/HermesAgent/D.發", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 7, "sample_children": ["Hermes-Backup_企業級災難復原", "HermesAgent_架構同步核心庫", "TryIT_GitHub_Bot工程套件", "UML2_架構工程圖.drawio", "UML2_系統架構展示套件.html", "github-bot", "remediation_高可用韌性架構演進"], "description": "本機桌面 HermesAgent 核心分類專案目錄「D.發」"}, {"name": "HermesAgent/Temp", "path": "/Users/howard/Desktop/HermesAgent/Temp", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 1, "sample_children": ["Seminar"], "description": "本機桌面 HermesAgent 核心分類專案目錄「Temp」"}, {"name": "HermesAgent/Z.Other", "path": "/Users/howard/Desktop/HermesAgent/Z.Other", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「Z.Other」"}, {"name": "~/Downloads", "path": "/Users/howard/Downloads", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 16, "sample_children": ["1.人員資料卡_健康調查表_鐿鈦_廖倫豪博士.doc", "1.人員資料卡_健康調查表_鐿鈦_廖倫豪博士.docx", "Claude.dmg", "Gemini.dmg", "GoogleDrive.dmg", "Hermes-Setup.dmg", "M3_hermes_20261024_081835-20261024T005817Z-1-001.zip", "OpenVanillaInstaller.app", "Scroll Reverser.app", "Twister5_金字塔策略簡報_30頁.pptx"], "description": "使用者個人標準工作目錄「Downloads」"}, {"name": "HermesAgent/README.md", "path": "/Users/howard/Desktop/HermesAgent/README.md", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「README.md」"}, {"name": "HermesAgent/generate_stickers.py", "path": "/Users/howard/Desktop/HermesAgent/generate_stickers.py", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「generate_stickers.py」"}, {"name": "HermesAgent/japan_shopping_guide_1920x1080.html", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_guide_1920x1080.html", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_guide_1920x1080.html」"}, {"name": "HermesAgent/japan_shopping_guide_1920x1080.jpg", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_guide_1920x1080.jpg", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_guide_1920x1080.jpg」"}, {"name": "HermesAgent/japan_shopping_guide_1920x1080.png", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_guide_1920x1080.png", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_guide_1920x1080.png」"}, {"name": "HermesAgent/japan_shopping_table_1920x1080.html", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_table_1920x1080.html", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_table_1920x1080.html」"}, {"name": "HermesAgent/japan_shopping_table_1920x1080.jpg", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_table_1920x1080.jpg", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_table_1920x1080.jpg」"}, {"name": "HermesAgent/japan_shopping_table_1920x1080.png", "path": "/Users/howard/Desktop/HermesAgent/japan_shopping_table_1920x1080.png", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「japan_shopping_table_1920x1080.png」"}, {"name": "HermesAgent/stickers", "path": "/Users/howard/Desktop/HermesAgent/stickers", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 34, "sample_children": ["01_您好.png", "02_早安.png", "02_早安_raw.png", "03_晚安.png", "03_晚安_raw.png", "04_謝謝.png", "04_謝謝_raw.png", "05_感恩.png", "05_感恩_raw.png", "06_收到.png", "06_收到_raw.png", "07_OK.png"], "description": "本機桌面 HermesAgent 核心分類專案目錄「stickers」"}, {"name": "~/Documents", "path": "/Users/howard/Documents", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "使用者個人標準工作目錄「Documents」"}, {"name": "~/Movies", "path": "/Users/howard/Movies", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 1, "sample_children": ["TV"], "description": "使用者個人標準工作目錄「Movies」"}, {"name": "~/Music", "path": "/Users/howard/Music", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 1, "sample_children": ["Music"], "description": "使用者個人標準工作目錄「Music」"}, {"name": "~/Pictures", "path": "/Users/howard/Pictures", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 1, "sample_children": ["Photos Library.photoslibrary"], "description": "使用者個人標準工作目錄「Pictures」"}, {"name": "~/Desktop/BCT-3628", "path": "/Users/howard/Desktop/BCT-3628", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 7, "sample_children": ["20261019_交通事故陳述報告書_BCT3628.docx", "20261019_交通事故陳述報告書_BCT3628.pdf", "DEVICE.XML", "Event", "Parking", "Photo", "Video"], "description": "使用者個人標準工作目錄「Desktop/BCT-3628」"}, {"name": "HermesAgent/Briefing", "path": "/Users/howard/Desktop/HermesAgent/Briefing", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「Briefing」"}, {"name": "HermesAgent/PortFilio", "path": "/Users/howard/Desktop/HermesAgent/PortFilio", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 30, "sample_children": ["2301", "4163", "6446", "8436", "BBQ", "CP", "CareerIsland", "HAH", "Hermes-Backup", "HermesAgent", "House01", "House02"], "description": "本機桌面 HermesAgent 核心分類專案目錄「PortFilio」"}, {"name": "HermesAgent/project_matrix.html", "path": "/Users/howard/Desktop/HermesAgent/project_matrix.html", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": false, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 0, "sample_children": [], "description": "本機桌面 HermesAgent 核心分類專案目錄「project_matrix.html」"}, {"name": "PortFilio/2301 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/2301", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 8, "sample_children": ["README.md", "assets", "generate_20page_dossier.py", "generate_30page_dossier.py", "index.html", "manifest.json", "sw.js", "光寶科技_IT_AI_平台負責人_面試報告暨高階學經歷_廖倫豪博士.docx"], "description": "本地已佈署獨立 Git 倉庫作品「2301」"}, {"name": "PortFilio/4163 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/4163", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 11, "sample_children": ["1.人員資料卡+健康調查表-鐿鈦(廖倫豪博士).docx", "1.人員資料卡_健康調查表_鐿鈦_廖倫豪博士.docx", "HowardLiao_4163_Dossier.pdf", "HowardLiao_4163_Presentation.pdf", "HowardLiao_4163_Web.pdf", "img", "index.html", "廖倫豪_鐿鈦4163_書面自薦書.pdf"], "description": "本地已佈署獨立 Git 倉庫作品「4163」"}, {"name": "PortFilio/6446 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/6446", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 23, "sample_children": ["PharmaEssentia_Advisory_Memo_to_Yuonne.docx", "PharmaEssentia_ArtDeco_Executive_Dossier.docx", "PharmaEssentia_CHRO_Engagement_Proposal.docx", "PharmaEssentia_CHRO_Response_Letter.docx", "PharmaEssentia_CIO_CTO_CISO_Governance_Charter.docx", "PharmaEssentia_CSIRT_Roster_and_Audit_Procedures.docx", "PharmaEssentia_Cyber_Resilience_Detailed_WBS.docx", "PharmaEssentia_DFIR_Miro_Report.docx"], "description": "本地已佈署獨立 Git 倉庫作品「6446」"}, {"name": "PortFilio/8436 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/8436", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 13, "sample_children": ["IDEA.md", "README.md", "TCI_8436_Howard_Architecture_32.drawio", "TCI_8436_Howard_企業架構_32全架構圖_HowardLiao.pdf", "TCI_8436_Howard_企業資訊架構_HowardLiao.pdf", "TCI_8436_Interactive_Full.drawio", "TCI_8436_右至左架構演進_HowardLiao.pdf", "TCI_8436_四大立竿見影場景與合規手冊_HowardLiao.pdf"], "description": "本地已佈署獨立 Git 倉庫作品「8436」"}, {"name": "PortFilio/BBQ (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/BBQ", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 3, "sample_children": ["README.md", "assets", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「BBQ」"}, {"name": "PortFilio/CP (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/CP", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 5, "sample_children": ["DESIGN_STYLE.md", "README.md", "assets", "cedar_partnered.html", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「CP」"}, {"name": "PortFilio/CareerIsland (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/CareerIsland", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 7, "sample_children": ["Howard_Liao_PhD_CV.pdf", "css", "data", "howard_portrait_blue.jpg", "index.html", "js", "廖倫豪_博士_高階履歷_Gemini生成版.docx"], "description": "本地已佈署獨立 Git 倉庫作品「CareerIsland」"}, {"name": "PortFilio/HAH (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/HAH", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 5, "sample_children": ["AI_Hospital_at_Home_HaH_智慧在宅醫療藍圖_Howard_Liao.pptx", "README.md", "hah_ai_presentation.html", "hah_ai_presentation.pptx", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「HAH」"}, {"name": "PortFilio/Hermes-Backup (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/Hermes-Backup", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 5, "sample_children": ["README.md", "index.html", "scripts", "server.py", "static"], "description": "本地已佈署獨立 Git 倉庫作品「Hermes-Backup」"}, {"name": "PortFilio/HermesAgent (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/HermesAgent", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 24, "sample_children": ["1.食", "2.衣", "3.住", "4.行", "5.育", "6.樂", "A.產", "B.銷"], "description": "本地已佈署獨立 Git 倉庫作品「HermesAgent」"}, {"name": "PortFilio/House01 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/House01", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 6, "sample_children": ["README.md", "RENTAL_GUIDELINES.md", "TryIT", "images", "index.html", "robots.txt"], "description": "本地已佈署獨立 Git 倉庫作品「House01」"}, {"name": "PortFilio/House02 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/House02", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["README.md", "RENTAL_GUIDELINES.md", "images", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「House02」"}, {"name": "PortFilio/Howard_CISO (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/Howard_CISO", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 43, "sample_children": ["202608_Howard_Liao_CISO_Resume_ZH.docx", "Howard_CISO_AI_Governance_Pyramid_30Slides.pptx", "Howard_Liao_CISO_Resume.docx", "Howard_Liao_CISO_Resume_EN.docx", "Howard_Liao_CISO_Resume_JA.docx", "Howard_Liao_CISO_Resume_ZH.docx", "Howard_Liao_PhD_CV.pdf", "Howard_Liao_PhD_Executive_CV_Milan.docx"], "description": "本地已佈署獨立 Git 倉庫作品「Howard_CISO」"}, {"name": "PortFilio/ISO_DM (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/ISO_DM", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 6, "sample_children": ["README.md", "assets", "governance_kickoff.html", "index.html", "iso27001_map.html", "盛欣_盛碁網絡_營運協同與治理標準化總綱_DMS.xlsx"], "description": "本地已佈署獨立 Git 倉庫作品「ISO_DM」"}, {"name": "PortFilio/MaMa (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/MaMa", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["README.md", "index.html", "媽媽照護與生活費用_每月彙整表.csv", "媽媽照護與生活費用_逐筆明細表.csv"], "description": "本地已佈署獨立 Git 倉庫作品「MaMa」"}, {"name": "PortFilio/RSI (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/RSI", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 51, "sample_children": ["AI_Coding生命週期管理導入專案報告_V1.0.pdf", "CEO_STRATEGIC_PLAN_2027.md", "Hive", "README.md", "RSI-data-architecture.html", "RSI_2027_CEO_Strategic_Plan.pdf", "RSI_2027_CEO戰略藍圖白皮書_周文津副總_HowardLiao.pdf", "RSI_2027_IT_Strategic_Blueprint_Egyptian_Pharaoh.pptx"], "description": "本地已佈署獨立 Git 倉庫作品「RSI」"}, {"name": "PortFilio/SX (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/SX", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 11, "sample_children": ["README.md", "assets", "chatgpt_procurement_swimlane.drawio", "chatgpt_procurement_swimlane.html", "chatgpt_procurement_swimlane.xml", "corporate_governance_nine_cycles.html", "governance_issue_portal.html", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「SX」"}, {"name": "PortFilio/SX-Osaka-Trip-2026 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/SX-Osaka-Trip-2026", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 5, "sample_children": ["README.md", "docs", "images", "index.html", "plans"], "description": "本地已佈署獨立 Git 倉庫作品「SX-Osaka-Trip-2026」"}, {"name": "PortFilio/SX001 (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/SX001", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 8, "sample_children": ["1150831.docx", "AI金融進階與詐騙情境模擬_教育訓練網頁.html", "README.md", "index.html", "potential_meme.png", "scam_simulation_1150831.docx", "sx_logo.png", "詐騙情境模擬1150831.docx"], "description": "本地已佈署獨立 Git 倉庫作品「SX001」"}, {"name": "PortFilio/Scam (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/Scam", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["AI財務分析及金融防詐_HowardLiao.pptx", "README.md", "assets", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「Scam」"}, {"name": "PortFilio/Seminar (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/Seminar", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 6, "sample_children": ["001", "004", "005", "README.md", "assets", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「Seminar」"}, {"name": "PortFilio/ShelterCenter (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/ShelterCenter", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["README.md", "assets", "index.html", "website_preview.png"], "description": "本地已佈署獨立 Git 倉庫作品「ShelterCenter」"}, {"name": "PortFilio/TryIT (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/TryIT", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["README.md", "package.json", "server.js", "test_simulator.js"], "description": "本地已佈署獨立 Git 倉庫作品「TryIT」"}, {"name": "PortFilio/fuyu (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/fuyu", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 14, "sample_children": ["115.09.22富宇大地重要文件調閱列印管理辦法.pdf", "README.md", "a2", "dajing.html", "index.html", "legal_docs", "logo.png", "robots.txt"], "description": "本地已佈署獨立 Git 倉庫作品「fuyu」"}, {"name": "PortFilio/howardliao.github.io (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/howardliao.github.io", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 27, "sample_children": ["Howard-一般CIO&CISO.zip", "Howard_Liao_PhD_CV.pdf", "Howard_Liao_PhD_Executive_Resume.docx", "README.md", "_config.yml", "assets", "cio_interview.jpg", "cio_magazine_cover.jpg"], "description": "本地已佈署獨立 Git 倉庫作品「howardliao.github.io」"}, {"name": "PortFilio/journey (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/journey", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 7, "sample_children": ["README.md", "assets", "build_journey_portal.py", "index.html", "組織從零到一的降維突圍實戰報告_米蘭風格.docx", "組織從零到一的降維突圍實戰報告_米蘭風格.pdf", "組織從零到一的降維突圍實戰報告_米蘭風格.pptx"], "description": "本地已佈署獨立 Git 倉庫作品「journey」"}, {"name": "PortFilio/portfolio (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/portfolio", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 16, "sample_children": ["Howard_Liao_PhD_CV.pdf", "README.md", "assets", "css", "cv-downloads.html", "data", "design-system", "index.html"], "description": "本地已佈署獨立 Git 倉庫作品「portfolio」"}, {"name": "PortFilio/remediation (Git)", "path": "/Users/howard/Desktop/HermesAgent/PortFilio/remediation", "disk_id": "internal", "disk_name": "Macintosh HD (內建)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 4, "sample_children": ["README.md", "casino_architecture_audit.html", "index.html", "remediation_roadmap.html"], "description": "本地已佈署獨立 Git 倉庫作品「remediation」"}, {"name": "2021_Work", "path": "/Volumes/My Book/2021_Work", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 11, "sample_children": ["15.運維 維運經理.docx", "202111", "20220608_捷元報價", "CSN", "ComboStack", "HH", "HYT", "academic", "nano", "基金會資安風險.docx", "基金會資安風險.pdf"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2021_Work」"}, {"name": "20220818_CSN_小米監控", "path": "/Volumes/My Book/20220818_CSN_小米監控", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 2, "sample_children": ["MIJIA_RECORD_VIDEO", "log"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20220818_CSN_小米監控」"}, {"name": "2022_CSN", "path": "/Volumes/My Book/2022_CSN", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 5, "sample_children": ["2021_CSN_錄音檔", "20220818_監控", "20220826_嘉洲貿易出勤表", "Micheal侵入公司", "嘉洲貿易勞資糾紛"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2022_CSN」"}, {"name": "2023_XSG", "path": "/Volumes/My Book/2023_XSG", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 50, "sample_children": ["20221011_googleNext", "20230317_調薪", "202305_F5 Solution", "20230821_ClASSII", "20230906_GCP選", "20231019_廠商Demo", "20231027_google簽呈", "20231106_google評選後合約", "20231205_旅遊補助", "2023_GCP用量不足額說明", "2023_預算_IT處", "2023年度績效考核期初目標設定作業"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2023_XSG」"}, {"name": "2024_XSG", "path": "/Volumes/My Book/2024_XSG", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 1, "sample_children": ["IT-2023年度績效考核表"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2024_XSG」"}, {"name": "2025_XSG", "path": "/Volumes/My Book/2025_XSG", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2025_XSG」"}, {"name": "2025_盛欣", "path": "/Volumes/My Book/2025_盛欣", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 58, "sample_children": ["20251223_MerryChristmas", "2025_年中考核", "AI", "AI 手遊的應用", "AI治理", "Akrama", "BlueStacks", "Game", "Image", "MIS", "MIS-SOC", "Temp"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2025_盛欣」"}, {"name": "2026_盛碁", "path": "/Volumes/My Book/2026_盛碁", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 15, "sample_children": ["AI教育訓練", "MIS", "Temp", "人", "例行維護", "公司流程", "外包", "市場分析", "新公司申請", "法務", "盛碁2026", "簽呈"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2026_盛碁」"}, {"name": "愛德萬測試公司", "path": "/Volumes/My Book/愛德萬測試公司", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "企業治理與業務體系", "cat_icon": "🏢", "cat_key": "enterprise", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「愛德萬測試公司」"}, {"name": "2022_Howard", "path": "/Volumes/My Book/2022_Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 15, "sample_children": ["104CYUT0396026-003-Howard.pdf", "15.運維 維運經理.docx", "202111", "20220608_捷元報價", "CSN", "ComboStack", "HH", "HYT", "Resume-Medea Kao(高芸茹).docx", "XSG", "academic", "nano"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2022_Howard」"}, {"name": "20230531_廖珈妤", "path": "/Volumes/My Book/20230531_廖珈妤", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 8, "sample_children": ["20221025_iphoneXR_Backup", "截圖 2023-05-24 下午2.27.24.png", "截圖 2023-05-24 下午2.27.41.png", "截圖 2023-05-24 下午2.28.03.png", "截圖 2023-05-24 下午2.28.22.png", "截圖 2023-05-24 下午2.28.37.png", "截圖 2023-05-24 下午2.28.53.png", "截圖 2023-05-24 下午2.29.12.png"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20230531_廖珈妤」"}, {"name": "20230905_貸款資料", "path": "/Volumes/My Book/20230905_貸款資料", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 7, "sample_children": ["個人證件資料", "公司資料", "匯豐銀行", "新光銀行", "理財試算_消費者貸款試算.pdf", "畢業證書-博士.jpg", "薪水"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20230905_貸款資料」"}, {"name": "20230921_國泰Bank40", "path": "/Volumes/My Book/20230921_國泰Bank40", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20230921_國泰Bank40」"}, {"name": "2023_Howard", "path": "/Volumes/My Book/2023_Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 43, "sample_children": ["0222_中台 AI", "111年度-廖倫豪-檢核用計算表.pdf", "20230110_台中科技大學_博士班", "20230203_新中元年房客地板膨脹處理", "20230216_廖珈妤大一第二學期學費", "20230503_小時候", "20230503_所得稅", "20230519_Roger 老師 CEO", "20230724_FSI", "20230727_Howard.jpg", "20230731_微笑歐洲", "202307_國泰房貸"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2023_Howard」"}, {"name": "20240428_微笑驗屋", "path": "/Volumes/My Book/20240428_微笑驗屋", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240428_微笑驗屋」"}, {"name": "20240509_廖倫豪薪資", "path": "/Volumes/My Book/20240509_廖倫豪薪資", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240509_廖倫豪薪資」"}, {"name": "20240728_原木自然風", "path": "/Volumes/My Book/20240728_原木自然風", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240728_原木自然風」"}, {"name": "20240828_西屯家", "path": "/Volumes/My Book/20240828_西屯家", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240828_西屯家」"}, {"name": "20241204_富邦保險", "path": "/Volumes/My Book/20241204_富邦保險", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20241204_富邦保險」"}, {"name": "2024_Howard", "path": "/Volumes/My Book/2024_Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2024_Howard」"}, {"name": "2024_開戶購", "path": "/Volumes/My Book/2024_開戶購", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2024_開戶購」"}, {"name": "20250929_廖珈蔓", "path": "/Volumes/My Book/20250929_廖珈蔓", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 4, "sample_children": ["20250915_小女兒iCloud 照片 (1).zip", "20250915_小女兒iCloud 照片 (2).zip", "20250915_小女兒iCloud 照片(3).zip", "20250915_小女兒iCloud 照片.zip"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20250929_廖珈蔓」"}, {"name": "2025_Howard", "path": "/Volumes/My Book/2025_Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 119, "sample_children": ["0412_原木屋修繕", "0525_教練來訪", "20250118_太原路車禍", "20250319_媽媽_中榮", "202504_隆中網絡薪資", "20250520_稅", "20250729_PA", "20250826_幸福診所", "20250914_舅", "20250920_雲端資訊安全與防護", "20250923_企業永續_天下學習", "20251020_國泰金控技術年會"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2025_Howard」"}, {"name": "2026_Howard", "path": "/Volumes/My Book/2026_Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 23, "sample_children": ["20260124_車上錄影", "20260213_HappyNewYear", "20260329_搬家", "AI", "CDAIO", "Cancer-NoNo", "Erwin", "Standly合作", "保險", "假媽媽", "八方雲集", "動態競爭"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2026_Howard」"}, {"name": "Howard", "path": "/Volumes/My Book/Howard", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "家庭、資產與法律理財", "cat_icon": "🏠", "cat_key": "family_wealth", "item_count": 2, "sample_children": ["2025_Howard", "2026_Howard"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Howard」"}, {"name": "20240509_Gartner", "path": "/Volumes/My Book/20240509_Gartner", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240509_Gartner」"}, {"name": "202408_Temp", "path": "/Volumes/My Book/202408_Temp", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「202408_Temp」"}, {"name": "Downloads", "path": "/Volumes/My Book/Downloads", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 26, "sample_children": ["2021_CSN_錄音檔", "20220811_LovePik", "20220815_勞資", "20220816_Temp", "20220816_境外主機", "20220907_OneDrive", "2025 CISO INSGHT", "202510_Temp", "20251110_iCloud_Backup", "20260417_女兒照片_iCloud Photos", "221206_All_大師回顧_給觀眾視覺筆記", "Apps"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Downloads」"}, {"name": "Temp", "path": "/Volumes/My Book/Temp", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "歷史下載與研析暫存", "cat_icon": "📂", "cat_key": "downloads_staging", "item_count": 4, "sample_children": ["20221214", "20230406", "20231101", "資訊技術處 衡量指標"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Temp」"}, {"name": "2021_Mac_App", "path": "/Volumes/My Book/2021_Mac_App", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 24, "sample_children": ["Adobe_Acrobat_Pro_DC_21.007.20091_f__macwk.com.dmg", "Axure_RP_9_9.0.0.3728_(最低10.9.0)__macwk.com.dmg", "Commander_One_3.3_(3508)_(最低10.12)__macwk.com.dmg", "DaisyDisk_4.21.4_(最低10.10)__macwk.com.dmg", "DropboxInstaller.dmg", "Final_Cut_Pro_10.6.1_(401159)_(最低11.5.1)__macwk.com.dmg", "FortiClientVPNOnlineInstaller_7.0.dmg", "Gemini_2_2.8.11_(384)_(最低10.10)__macwk.com.dmg", "LogiPresentation_1.62.2.dmg", "MEGAsyncSetup.dmg", "MindManager_Mac_14.0.178.dmg", "Navicat_Premium_16.0.6_(16.0.600)_(最低10.14)__macwk.com.dmg"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2021_Mac_App」"}, {"name": "MacHD", "path": "/Volumes/My Book/MacHD", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 49, "sample_children": ["20180416", "201806-Howard.pptx", "20180619-temp", "20190221-HowardResume.pdf", "20190402-東柏.pptx", "20190411-台虹.pptx", "20190412-巨鷗.pptx", "20190417-Mac", "20191119-128GB_USB", "20191209-Downloads", "20200102-backup", "202010_Music"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「MacHD」"}, {"name": "Mac_DOCK", "path": "/Volumes/My Book/Mac_DOCK", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 17, "sample_children": ["20211020_iphone_backup", "2021_Mac_App", "2021_Work", "20220818_CC", "20220818_CSN_小米監控", "20220818_江恐嚇", "20220818_監控", "2022_SP_Backup", "DigiFusion", "Local", "MacBook Pro  Backup", "Micheal侵入公司"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Mac_DOCK」"}, {"name": "PNYPROLITE", "path": "/Volumes/My Book/PNYPROLITE", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 17, "sample_children": ["20211020_iphone_backup", "2021_Mac_App", "2021_WORK", "202207_Temp", "2022091_MacBookPro", "202209_MacBook_Backup", "ChenSir", "Local", "MacBook Pro  Backup", "Office2019.zip", "PNY-v2.ico", "PortFolio Management"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「PNYPROLITE」"}, {"name": "Weekly Scrym Sprint Status Report Template", "path": "/Volumes/My Book/Weekly Scrym Sprint Status Report Template", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "系統映像、虛擬機與軟體工具", "cat_icon": "💾", "cat_key": "tools_vms", "item_count": 7, "sample_children": ["How to Write a Weekly Status Report.docx", "IC-Weekly-Agile-Sprint-Status-Report-11416_0.xlsx", "IC-Weekly-Project-Status-Report-11416.xlsx", "IC-Weekly-Project-Status-Report-Example-11416.xlsx", "IC-Weekly-Project-Status-Report-Slideshow-11416_PowerPoint.pptx", "IC-Weekly-Status-Report-Dashboard-11416.xlsx", "如何撰寫每周狀態報告.docx"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Weekly Scrym Sprint Status Report Template」"}, {"name": "20240910_原本自然風", "path": "/Volumes/My Book/20240910_原本自然風", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240910_原本自然風」"}, {"name": "20240917_Synergy", "path": "/Volumes/My Book/20240917_Synergy", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240917_Synergy」"}, {"name": "2024_Charlene", "path": "/Volumes/My Book/2024_Charlene", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2024_Charlene」"}, {"name": "Desktop", "path": "/Volumes/My Book/Desktop", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 11, "sample_children": ["20221011_googleNext", "20221025_iphoneXR_Backup", "2022_CSN", "2022_Howard", "20230203_目標", "2023_Howard", "2023_XSG", "Holistic Kubernetes Security for the Enterprise - Aqua_files", "Temp", "Theme", "Weekly Scrym Sprint Status Report Template"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Desktop」"}, {"name": "DigiFusion", "path": "/Volumes/My Book/DigiFusion", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 34, "sample_children": ["20201011-嶺東.pptx", "20210214_江董_002.pptx", "20210329_128G_Backup", "20210820_Sam", "20210906_Temp", "20210916_MAC_最近項目", "20210928_Howard下載項目", "20211020_iphone_backup", "2021_10_桌面", "2021_Mac_App", "2021_WORK", "202207_Temp"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「DigiFusion」"}, {"name": "Documents", "path": "/Volumes/My Book/Documents", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 8, "sample_children": ["20220818_CC_傷害", "Adobe", "Axure", "CorelCAD_root_autosave", "DearMob", "My Drawings", "VPProjects", "google driver"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Documents」"}, {"name": "Install Western Digital Software for Mac.dmg", "path": "/Volumes/My Book/Install Western Digital Software for Mac.dmg", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": false, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Install Western Digital Software for Mac.dmg」"}, {"name": "Local", "path": "/Volumes/My Book/Local", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 94, "sample_children": ["1.平台服務", "2.硬體及網路", "20180621133518_cht.pdf", "20190514-OurSoution.jpg", "20190514-合約", "20190520-資訊人員考試", "20190528-人資資料", "20190613-SAP_BI報表介紹(華致)", "20190617-資訊策略計劃", "20190618-SAP DATA HUB", "20190618-資訊安全管理要點", "20190619-Ariba"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Local」"}, {"name": "MEGA", "path": "/Volumes/My Book/MEGA", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 2, "sample_children": ["APPSource", "Books"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「MEGA」"}, {"name": "back", "path": "/Volumes/My Book/back", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 9, "sample_children": ["Visual", "csn", "homes", "public", "rd", "客服", "文管", "管理者", "行政"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「back」"}, {"name": "back-louise", "path": "/Volumes/My Book/back-louise", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "綜合資料與存檔", "cat_icon": "📁", "cat_key": "other", "item_count": 2, "sample_children": ["louise", "管理者"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「back-louise」"}, {"name": "20211020_iphone_backup", "path": "/Volumes/My Book/20211020_iphone_backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 1, "sample_children": ["照片"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20211020_iphone_backup」"}, {"name": "202208_Dropbox", "path": "/Volumes/My Book/202208_Dropbox", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 87, "sample_children": ["20161216-JC開講", "2017FC", "20180210_庭瑄本票處理", "20180327-車k到", "20180411-Tableau", "20180719-clothes", "20180812-邀請函", "20180912", "20180913-AsQR", "20180917-大腸癌", "20181016-松山房租", "20181114-AsQR"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「202208_Dropbox」"}, {"name": "2022_SP_Backup", "path": "/Volumes/My Book/2022_SP_Backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 15, "sample_children": ["1.古典", "66", "@tmp", "Good", "Howard", "ISO", "Source", "TV_series", "Win 7 Ultimate (x86, with Pre-SP2).iso", "Windows 10 20181129-1", "images", "vmware-pro15.zip"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「2022_SP_Backup」"}, {"name": "20231212_MacBookPro_Backup", "path": "/Volumes/My Book/20231212_MacBookPro_Backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20231212_MacBookPro_Backup」"}, {"name": "20240726_iCloud", "path": "/Volumes/My Book/20240726_iCloud", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240726_iCloud」"}, {"name": "20241204_影片Backup", "path": "/Volumes/My Book/20241204_影片Backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20241204_影片Backup」"}, {"name": "MacBook Pro  Backup", "path": "/Volumes/My Book/MacBook Pro  Backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 27, "sample_children": ["20220818_CC", "2022_Howard", "2023_Howard", "2023_XSG", "20240428_微笑驗屋", "20240509_Gartner", "20240509_廖倫豪薪資", "20240828_西屯家", "20240917_Synergy", "20241204_富邦保險", "20241209_Iphone14ProMax", "202412_CISSP"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「MacBook Pro  Backup」"}, {"name": "One_Driver", "path": "/Volumes/My Book/One_Driver", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 11, "sample_children": ["1.pdf", "2.pdf", "20200515-Howard.mp4", "Howard_Portfolio.rar", "ppt", "交互式電子白板應用的情境.docx", "公用", "圖片", "文件", "桌面", "附件"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「One_Driver」"}, {"name": "SD_Backup", "path": "/Volumes/My Book/SD_Backup", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 19, "sample_children": ["20190921-媽媽住院", "20191007-組織權責", "20191009-網站管理.docx", "20201011-嶺東.pptx", "20210425_嶺東科技大學演講", "FoxitPhantomPDF91_L10N.rar", "Local", "Local.rar", "PortFolio Management", "SAP系統.rar", "Source for ASP.rar", "Video_2020-04-21_145015.wmv"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「SD_Backup」"}, {"name": "Theme", "path": "/Volumes/My Book/Theme", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 29, "sample_children": ["vladstudio_alice_dragon_skiing_1920x1440_signed.jpg", "vladstudio_cantsleep_1920x1440_signed.jpg", "vladstudio_cappuccino_tree_1920x1440_signed.jpg", "vladstudio_cats_1024x768_signed.jpg", "vladstudio_cats_1920x1440_signed.jpg", "vladstudio_coffee_station_wallpaper.jpg", "vladstudio_drops_gold_1920x1440_signed.jpg", "vladstudio_googlelibrary_1920x1440_signed.jpg", "vladstudio_jupiter_1920x1440_signed.jpg", "vladstudio_lion_wallpaper.jpg", "vladstudio_lower_antelope_1920x1440_signed.jpg", "vladstudio_moai_1920x1440_signed.jpg"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Theme」"}, {"name": "USB碰碟", "path": "/Volumes/My Book/USB碰碟", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 19, "sample_children": ["20190921-媽媽住院", "20191007-組織權責", "20191009-網站管理.docx", "20201011-嶺東.pptx", "20210425_嶺東科技大學演講", "FoxitPhantomPDF91_L10N.rar", "Local", "Local.rar", "PortFolio Management", "SAP系統.rar", "Source for ASP.rar", "Video_2020-04-21_145015.wmv"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「USB碰碟」"}, {"name": "VR", "path": "/Volumes/My Book/VR", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "裝置備份與多媒體庫", "cat_icon": "📱", "cat_key": "devices_media", "item_count": 6, "sample_children": ["20230421-VR-Market.xlsx", "20230502-VR-marker01.xlsx", "202305_PayRoll.xlsx", "CQ9 Game List&Profile.xlsx", "VR軟體.xlsx", "個人工作能力進展與未來發展規劃2018_林昌甫.xlsx"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「VR」"}, {"name": "20220818_監控", "path": "/Volumes/My Book/20220818_監控", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 6, "sample_children": ["20220818_CC", "20220818_CC.zip", "20220818_CC_刑事案件", "20220818_CSN_小米監控", "20220818_老江恐嚇.zip", "CC_CC"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20220818_監控」"}, {"name": "20230505_Kpoint", "path": "/Volumes/My Book/20230505_Kpoint", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 2, "sample_children": ["SurveyCake Enterprise", "臺中市政府「112年度臺中市老人生活狀況及福利需求調查」_問卷v6.docx"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20230505_Kpoint」"}, {"name": "20240801_ESG-中興大學", "path": "/Volumes/My Book/20240801_ESG-中興大學", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「20240801_ESG-中興大學」"}, {"name": "Holistic Kubernetes Security for the Enterprise - Aqua_files", "path": "/Volumes/My Book/Holistic Kubernetes Security for the Enterprise - Aqua_files", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 48, "sample_children": ["0", "04-22-2022-Threat-Report-RT.jpg", "1665891(1).js", "1665891(2).js", "1665891.js", "25111106.js", "6si.min.js", "9110.js", "9f3da9c9548f49afb749af05814a9fbf.html", "Apolicy_updated_Image-For-Web.jpg", "Aqua-Logo-Color-RGB-2022-300x300-1-140x140.jpg", "Audit-For-Web-Image-1.jpg"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Holistic Kubernetes Security for the Enterprise - Aqua_files」"}, {"name": "Micheal侵入公司", "path": "/Volumes/My Book/Micheal侵入公司", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 4, "sample_children": ["2022082218", "2022082219", "2022082220", "2022082221"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「Micheal侵入公司」"}, {"name": "iPAS", "path": "/Volumes/My Book/iPAS", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 5, "sample_children": ["3edf72f8-1001-4a7f-87ef-502a17093255.mp4", "8月班上課電子檔", "iPAS經濟部產業人才能力鑑定資訊安全筆記.docx", "【2024年第5期】AI世代的數位推動與勞動力發展應用.pdf", "企業碳管理：了解淨零趨勢、掌握「低碳商機」0622.ppt"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「iPAS」"}, {"name": "技術文件", "path": "/Volumes/My Book/技術文件", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 5, "sample_children": ["1745501878741.gif", "Cybersec 2025 – Fortinet 資安品牌日 – Fortinet Taiwan", "Erwin", "Trellix", "黃金屋"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「技術文件」"}, {"name": "政府機關雲端服務應用資安參考指引v1.2_1110817(pdf)", "path": "/Volumes/My Book/政府機關雲端服務應用資安參考指引v1.2_1110817(pdf)", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 4, "sample_children": ["政府機關雲端服務應用資安參考指引v1.2_1110817.pdf", "附件1_專有名詞英中對照表v1.2_1110817.pdf", "附件2_雲端運算運作原理v1.2_1110817.pdf", "附件3_雲端服務資安控制措施查檢表v1.2_1110817.pdf"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「政府機關雲端服務應用資安參考指引v1.2_1110817(pdf)」"}, {"name": "資安人蔘 _ 【 CTF種子培訓工作坊 - 臺中場開放報名！】（已額滿） 親愛的蔘友們~~資安院為擴大培育資安人才，將於7月10日舉辦「CTF種子培訓工作坊」，鼓勵更多年輕學子踏入資安領域，並_files", "path": "/Volumes/My Book/資安人蔘 _ 【 CTF種子培訓工作坊 - 臺中場開放報名！】（已額滿） 親愛的蔘友們~~資安院為擴大培育資安人才，將於7月10日舉辦「CTF種子培訓工作坊」，鼓勵更多年輕學子踏入資安領域，並_files", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "資安架構與技術專案", "cat_icon": "🛡️", "cat_key": "security", "item_count": 0, "sample_children": [], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「資安人蔘 _ 【 CTF種子培訓工作坊 - 臺中場開放報名！】（已額滿） 親愛的蔘友們~~資安院為擴大培育資安人才，將於7月10日舉辦「CTF種子培訓工作坊」，鼓勵更多年輕學子踏入資安領域，並_files」"}, {"name": "PortFolio Management", "path": "/Volumes/My Book/PortFolio Management", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 13, "sample_children": ["2019", "20190506.pptx", "20191106-巨將-履歷表 廖倫豪.doc", "2019_Sample001.pptx", "2019_Sample002.pptx", "2020", "2020_慧智創意", "Howard Logo.jfif", "Howard-Logo1.png", "_gsdata_", "專案人員履歷_廖倫豪.docx", "巨將-履歷表 廖倫豪.doc"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「PortFolio Management」"}, {"name": "iLinkict_PortFolio", "path": "/Volumes/My Book/iLinkict_PortFolio", "disk_id": "mybook", "disk_name": "WD My Book (14TB)", "is_dir": true, "category": "高管履歷與作品集體系", "cat_icon": "💼", "cat_key": "portfolio", "item_count": 36, "sample_children": ["0310-防救災系统with5G.pptx", "2019", "201909-iLink", "20191121-友環JIRA", "2019_iLink_Taichung-QMS.pptx", "2019經費及工時預估分析表.xls", "2020", "20200420-工作交接", "994163159L3EO3FL6.pdf", "DevOps", "H13A04-iLInkict專案調適指引.pdf", "H15K04-工作分解結構WBS.xls"], "description": "位於 My Book 外接硬碟根目錄下的歸檔專案「iLinkict_PortFolio」"}];
+
+    let currentDiskFilter = 'all';
+    let currentCatFilter = 'all';
+    let currentSearchTerm = '';
+
+    function changeTheme(themeName) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      localStorage.setItem('storage_matrix_theme', themeName);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('storage_matrix_theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.getElementById('themeSelector').value = savedTheme;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`已複製路徑：${text}`);
+      }).catch(err => {
+        prompt("請手動複製路徑：", text);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `<span>📋 ${msg}</span>`;
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2600);
+    }
+
+    function setDiskFilter(diskId) {
+      currentDiskFilter = diskId;
+      document.querySelectorAll('#diskPills .pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-disk') === diskId);
+      });
+      renderCatalog();
+    }
+
+    function setCatFilter(catKey) {
+      currentCatFilter = catKey;
+      document.querySelectorAll('#catPills .pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === catKey);
+      });
+      renderCatalog();
+    }
+
+    function handleSearch() {
+      const input = document.getElementById('searchInput');
+      currentSearchTerm = input.value.trim().toLowerCase();
+      document.getElementById('searchClearBtn').style.display = currentSearchTerm ? 'block' : 'none';
+      renderCatalog();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      currentSearchTerm = '';
+      document.getElementById('searchClearBtn').style.display = 'none';
+      renderCatalog();
+      input.focus();
+    }
+
+    // Keyboard shortcut Cmd+K or / to search
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey && e.key === 'k') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')) {
+        e.preventDefault();
+        const input = document.getElementById('searchInput');
+        input.focus();
+        input.select();
+      }
+    });
+
+    function renderCatalog() {
+      const grid = document.getElementById('catalogGrid');
+      const countEl = document.getElementById('resultsCount');
+
+      const filtered = CATALOG_DATA.filter(item => {
+        // Disk filter
+        if (currentDiskFilter !== 'all' && item.disk_id !== currentDiskFilter) return false;
+        
+        // Category filter
+        if (currentCatFilter !== 'all' && item.cat_key !== currentCatFilter) return false;
+
+        // Search term
+        if (currentSearchTerm) {
+          const targetStr = (
+            item.name + ' ' + 
+            item.path + ' ' + 
+            item.category + ' ' + 
+            item.disk_name + ' ' + 
+            item.description + ' ' + 
+            (item.sample_children || []).join(' ')
+          ).toLowerCase();
+          if (!targetStr.includes(currentSearchTerm)) return false;
+        }
+
+        return true;
+      });
+
+      countEl.innerHTML = `正在顯示 <strong>${filtered.length}</strong> 個收錄項目（共 ${CATALOG_DATA.length} 個）`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+            <h3>查無符合條件的目錄或檔案</h3>
+            <p>請嘗試更換關鍵字、清除過濾篩選條件，或使用繁簡體同義詞搜尋。</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const childrenPreview = item.sample_children && item.sample_children.length > 0 
+          ? `
+            <div class="item-children">
+              <div class="children-title">
+                <span>📂 包含子項 / 核心檔案 (${item.item_count} 個)</span>
+              </div>
+              <div class="children-pills">
+                ${item.sample_children.map(c => `<span class="sub-pill" title="${c}">${c}</span>`).join('')}
+              </div>
+            </div>
+          ` 
+          : '';
+
+        const typeBadge = item.is_dir ? '📁 資料夾' : '📄 檔案';
+
+        return `
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-badges">
+                <span class="badge-cat">${item.cat_icon} ${item.category}</span>
+                <span class="badge-disk">${item.disk_name}</span>
+              </div>
+              <div class="item-title">
+                <span>${item.name}</span>
+              </div>
+              <div class="item-desc">${item.description}</div>
+              ${childrenPreview}
+            </div>
+            
+            <div class="item-footer">
+              <div class="path-display" title="${item.path}">${item.path}</div>
+              <button class="action-btn" onclick="copyToClipboard('${item.path.replace(/'/g, "\\\'")}')">
+                📋 複製路徑
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Initial Render
+    renderCatalog();
+  </script>
+</body>
+</html>
