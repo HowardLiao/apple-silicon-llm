@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/continuedev/continue/main/packages/config-yaml/schema.json",
+  "models": [
+    {
+      "title": "Local Qwen 14B (Chat & Refactor)",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:14b",
+      "apiBase": "http://127.0.0.1:11434"
+    },
+    {
+      "title": "Local Qwen 7B (Lightweight Chat)",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b",
+      "apiBase": "http://127.0.0.1:11434"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Local Qwen 7B (Autocomplete)",
+    "provider": "ollama",
+    "model": "qwen2.5-coder:7b",
+    "apiBase": "http://127.0.0.1:11434"
+  },
+  "customCommands": [
+    {
+      "name": "review",
+      "prompt": "Review this code for edge cases, performance bottlenecks, and security vulnerabilities according to executive standards. Give concise, actionable feedback with unified diffs where appropriate.",
+      "description": "Executive Code Review"
+    },
+    {
+      "name": "refactor",
+      "prompt": "Refactor this code to follow clean architecture principles, adding explicit type annotations and docstrings without modifying external behaviour.",
+      "description": "Refactor with Type Annotations"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "codebase",
+      "params": {}
+    }
+  ]
+}
